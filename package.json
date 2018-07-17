@@ -1,0 +1,15 @@
+{
+  "name": "bdnd_project_2",
+  "version": "1.0.0",
+  "description": "BDND_project_2",
+  "main": "levelSandbox.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alan Hekle",
+  "license": "ISC",
+  "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "level": "^4.0.0"
+  }
+}
