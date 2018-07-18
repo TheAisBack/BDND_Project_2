@@ -40,7 +40,7 @@ class Blockchain{
   // Add new block  
   // 1. addBlock(newBlock) includes a method to store newBlock within LevelDB
   addBlock(newBlock){
-    getBlockFromLevelDB(key, function (value) {
+    getBlockFromLevelDB(newBlock, function (value) {
       // Block height
       newBlock.height = this.chain.length;
       // UTC timestamp
@@ -73,7 +73,7 @@ class Blockchain{
   // validate block
   // 3. Modify the validateBlock() function to validate a block stored within levelDB
   validateBlock(blockHeight){
-    getBlockFromLevelDB(key, function (value) {
+    getBlockFromLevelDB(blockHeight, function (value) {
       // get block object
       let block = this.getBlock(value);
       // get block hash
