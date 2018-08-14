@@ -76,31 +76,44 @@ class Blockchain {
 
 	// Add new block  
 	// 1. addBlock(newBlock) includes a method to store newBlock within LevelDB
-	addBlock(newBlock){
-		// Block height
-		newBlock.height = this.chain.length;
-		// UTC timestamp
+  addBlock(newBlock){
+		//  Block height - New method - Udacity Knowledge
+		//  newBlock.height = this.chain.length;
+		//  UTC timestamp
 		newBlock.time = new Date().getTime().toString().slice(0,-3);
-		// previous block hash
+		//  previous block hash
 		if(this.chain.length>0){
 			newBlock.previousBlockHash = this.chain[this.chain.length-1].hash;
 		}
-		// Block hash with SHA256 using newBlock and converting to a string
-		newBlock.hash = SHA256(JSON.stringify(value)).toString();
-		// Adding block object to chain
-		this.chain.push(value);
-    // Add the newblock to the function addDataToLevelDB
-    addDataToLevelDB(JSON.stringify(newBlock));
+		//  Block hash with SHA256 using newBlock and converting to a string
+		newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
+		//  Adding block object to chain
+		//  this.chain.push(value);
+    //  Add the newblock to the function addDataToLevelDB, new way to get height
+    this.addLevelDBData(newBlock.height, newBlock);
 	}
 
-	// 6. Modify getBlockHeight() function to retrieve current block height
-	//		within the LevelDB chain
-  getBlockHeight(){
-    return this.chain.length-1;
+  //  New method to add information to LevelDB. 
+  addLevelDBData(height, newBlock){
+    db.put(height, JSON.stringify(newBlock), function(err) {
+      if (err) return console.log('Block ' + newBlock.height + ' submission failed', err);
+    });
   }
 
-	// 5. Modify getBlock() function to retrieve a block by its block heigh
-	//		within the LevelDB chain
+	// Modify getBlockHeight() function to retrieve current block height within the LevelDB chain
+  getBlockHeight(){
+    let i = 0;
+    db.createReadStream().on('data', function(data) {
+      i++;
+    }).on('error', function(err) {
+      return console.log('Unable to find current height', err)
+    }).on('close', function() {
+      console.log('Found Height' + i);
+      return i -1;
+    });
+  }
+
+	// Modify getBlock() function to retrieve a block by its block height within the LevelDB chain
   getBlock(blockHeight) {
     getLevelDBData(blockHeight)
     .then(value => console.log(JSON.parse(value)))
@@ -108,26 +121,31 @@ class Blockchain {
   }
 
 	// validate block
-	// 3. Modify the validateBlock() function to validate a block stored within levelDB
+	// Modify the validateBlock() function to validate a block stored within levelDB
   validateBlock(blockHeight){
-    // get block object
-    let block = this.getBlock(blockHeight);
-    // get block hash
-    let blockHash = block.hash;
-    // remove block hash to test block integrity
-    block.hash = '';
-    // generate block hash
-    let validBlockHash = SHA256(JSON.stringify(block)).toString();
-    // Compare
-    if (blockHash===validBlockHash) {
-      return true;
-    } else {
-      console.log('Block #'+blockHeight+' invalid hash:\n'+blockHash+'<>'+validBlockHash);
-      return false;
-    }
+    // Getting a Promise returned - Help From Udacity Knowledge
+    return new Promise(function (resolve, reject) {
+      // Adding to levelDB
+      db.get('newadd' + blockHeight, function(err, value) {
+        // get block hash
+        let blockHash = JSON.parse(value).hash;
+        // remove block hash to test block integrity
+        value.hash = '';
+        // generate block hash
+        let validBlockHash = SHA256(JSON.stringify(value)).toString();
+        // Compare
+        if (blockHash===validBlockHash) {
+          return true;
+        } else {
+          console.log('Block #'+blockHeight+' invalid hash:\n'+blockHash+'<>'+validBlockHash);
+          return false;
+        }
+      })
+    })
   }
 
   // Validate blockchain
+  // Modify validateChain() function to validate blockchain stored within levelDB
   validateChain(){
     let errorLog = [];
     for (var i = 0; i < this.chain.length-1; i++) {
