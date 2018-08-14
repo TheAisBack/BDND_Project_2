@@ -24,11 +24,17 @@ function addLevelDBData(key, value) {
 }
 
 // Get data from levelDB with key
-function getLevelDBData(key){
-  db.get(key, function(err, value) {
-    if (err) return console.log('Not found!', err);
-    console.log('Value = ' + value);
-  })
+function getLevelDBData(key) {
+  return new Promise((resolve, reject) => {
+    db.get(key, function(err, value) {
+      if (err) {
+        console.log("Not found!", err);
+        reject(err);
+      } else {
+        resolve(value);
+      }
+    });
+  });
 }
 
 // Add data to levelDB with value
@@ -95,9 +101,10 @@ class Blockchain {
 
 	// 5. Modify getBlock() function to retrieve a block by its block heigh
 	//		within the LevelDB chain
-  getBlock(blockHeight){
-    // return object as a single string
-    return JSON.parse(JSON.stringify(this.chain[blockHeight]));
+  getBlock(blockHeight) {
+    getLevelDBData(blockHeight)
+    .then(value => console.log(JSON.parse(value)))
+    .catch(err => console.log(err));
   }
 
 	// validate block
