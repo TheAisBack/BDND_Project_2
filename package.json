@@ -11,5 +11,14 @@
   "dependencies": {
     "crypto-js": "^3.1.9-1",
     "level": "^4.0.0"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheAisBack/BDND_Project_2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TheAisBack/BDND_Project_2/issues"
+  },
+  "homepage": "https://github.com/TheAisBack/BDND_Project_2#readme"
 }
