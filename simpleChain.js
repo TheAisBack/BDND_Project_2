@@ -79,6 +79,7 @@ class Blockchain {
   addBlock(newBlock){
 		//  Block height - New method - Udacity Knowledge
 		//  newBlock.height = this.chain.length;
+    newBlock.height = previousBlockHeight +1
 		//  UTC timestamp
 		newBlock.time = new Date().getTime().toString().slice(0,-3);
 		//  previous block hash
